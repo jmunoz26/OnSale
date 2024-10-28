@@ -1,0 +1,17 @@
+﻿@model OnSale.Data.Entities.City
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <partial name="_CityDetails" />
+</div>
+<br />
+
+<div>
+    <a asp-action="EditCity" asp-route-id="@Model?.Id" class="btn btn-outline-warning">Edit</a>
+    <a asp-action="DetailsState" asp-route-id="@Model?.State.Id" class="btn btn-outline-success">Back to List</a>
+</div>
