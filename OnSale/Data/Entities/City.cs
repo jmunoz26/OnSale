@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnSale.Data.Entities;
 
-public class Country
+public class City
 {
   public int Id { get; set; }
 
@@ -11,9 +11,6 @@ public class Country
   [Required]
   public string Name { get; set; }
 
-  public ICollection<State> States { get; set; }
-
-  [Display(Name = "States")]
-  public int StatesNumber => States == null ? 0 : States.Count;
+  public State State { get; set; }
 
 }
