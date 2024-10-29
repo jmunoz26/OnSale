@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 using OnSale.Data.Entities;
+using OnSale.Models;
 
 namespace OnSale.Helpers;
 
@@ -15,5 +16,10 @@ public interface IUserHelper
   Task AddUserToRoleAsync(User user, string roleName);
 
   Task<bool> IsUserInRoleAsync(User user, string roleName);
+
+  Task<SignInResult> LoginAsync(LoginViewModel model);
+
+  Task LogoutAsync();
+
 }
 

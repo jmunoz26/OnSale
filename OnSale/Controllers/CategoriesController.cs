@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnSale.Data;
@@ -6,10 +7,10 @@ using OnSale.Data.Entities;
 
 namespace OnSale.Controllers;
 
+[Authorize(Roles = "Admin")]
 public class CategoriesController(DataContext context) : Controller
 {
   private readonly DataContext _context = context;
-
   public async Task<IActionResult> Index()
   {
     return View(await _context.Categories.ToListAsync());
