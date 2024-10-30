@@ -1,12 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Identity;
-using OnSale.Data.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace OnSale.Data.Entities;
+namespace OnSale.Models;
 
-public class User : IdentityUser
+public class EditUserViewModel
 {
+  public string Id { get; set; }
+
   [Display(Name = "Document")]
   [MaxLength(20, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
   [Required(ErrorMessage = "The field {0} is required.")]
@@ -27,24 +28,40 @@ public class User : IdentityUser
   [Required(ErrorMessage = "The field {0} is required.")]
   public string Address { get; set; }
 
+  [Display(Name = "Phone Number")]
+  [MaxLength(20, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
+  [Required(ErrorMessage = "The field {0} is required.")]
+  public string PhoneNumber { get; set; }
+
   [Display(Name = "Photo")]
   public Guid ImageId { get; set; }
 
   [Display(Name = "Photo")]
   public string ImageFullPath => ImageId == Guid.Empty
-      ? $"https://localhost:5051/images/noimage.png"
+      ? $"https://localhost:7057/images/noimage.png"
       : $"https://orderszulu2024.blob.core.windows.net/users/{ImageId}";
 
-  [Display(Name = "User Type")]
-  public UserType UserType { get; set; }
+  [Display(Name = "Image")]
+  public IFormFile ImageFile { get; set; }
+
+  [Display(Name = "Country")]
+  [Range(1, int.MaxValue, ErrorMessage = "You must select a country.")]
+  [Required(ErrorMessage = "The field {0} is required.")]
+  public int CountryId { get; set; }
+
+  public IEnumerable<SelectListItem> Countries { get; set; }
+
+  [Display(Name = "State/Department")]
+  [Range(1, int.MaxValue, ErrorMessage = "You must select a state/department.")]
+  [Required(ErrorMessage = "The field {0} is required.")]
+  public int StateId { get; set; }
+
+  public IEnumerable<SelectListItem> States { get; set; }
 
   [Display(Name = "City")]
-  public City City { get; set; }
+  [Range(1, int.MaxValue, ErrorMessage = "You must select a city.")]
+  public int CityId { get; set; }
 
-  [Display(Name = "User")]
-  public string FullName => $"{FirstName} {LastName}";
+  public IEnumerable<SelectListItem> Cities { get; set; }
 
-  [Display(Name = "User")]
-  public string FullNameWithDocument => $"{FirstName} {LastName} - {Document}";
 }
-
