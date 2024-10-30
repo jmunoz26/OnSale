@@ -1,12 +1,9 @@
-using System;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using OnSale.Data;
 using OnSale.Data.Entities;
-using OnSale.Data.Enums;
 using OnSale.Helpers;
 using OnSale.Models;
-
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 namespace OnSale.Controllers;
 
 public class AccountController(IUserHelper userHelper, DataContext context, ICombosHelper combosHelper, IBlobHelper blobHelper) : Controller
@@ -31,13 +28,21 @@ public class AccountController(IUserHelper userHelper, DataContext context, ICom
   {
     if (ModelState.IsValid)
     {
-      Microsoft.AspNetCore.Identity.SignInResult result = await _userHelper.LoginAsync(model);
+      SignInResult result = await _userHelper.LoginAsync(model);
       if (result.Succeeded)
       {
         return RedirectToAction("Index", "Home");
       }
 
-      ModelState.AddModelError(string.Empty, "Incorrect email or password.");
+      if (result.IsLockedOut)
+      {
+        ModelState.AddModelError(string.Empty, "You have exceeded the maximum number of attempts, your account is blocked, please try again in 5 minutes.");
+      }
+      else
+      {
+        ModelState.AddModelError(string.Empty, "Incorrect email or password.");
+      }
+
     }
 
     return View(model);

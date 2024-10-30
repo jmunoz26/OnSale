@@ -111,11 +111,6 @@ public class UserHelper(DataContext context,
     return await _userManager.IsInRoleAsync(user, roleName);
   }
 
-  public async Task<SignInResult> LoginAsync(LoginViewModel model)
-  {
-    return await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, false);
-  }
-
   public async Task LogoutAsync()
   {
     await _signInManager.SignOutAsync();
@@ -157,5 +152,10 @@ public class UserHelper(DataContext context,
   public async Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword)
   {
     return await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
+  }
+
+  public async Task<SignInResult> LoginAsync(LoginViewModel model)
+  {
+    return await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, true);
   }
 }
