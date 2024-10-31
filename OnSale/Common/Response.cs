@@ -2,12 +2,12 @@ using System;
 
 namespace OnSale.Common;
 
-public class Response
+public class Response<T>
 {
   public bool IsSuccess { get; set; }
 
-  public string Message { get; set; }
+  public string Message { get; set; } = null!;
 
-  public object Result { get; set; }
+  public object Result { get; set; } = null!;
 }
 

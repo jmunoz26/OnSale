@@ -14,5 +14,5 @@ public class City
 
   [JsonIgnore]
   public State State { get; set; } = null!;
-  public ICollection<User>? Users { get; set; }
+  public ICollection<User> Users { get; set; }
 }

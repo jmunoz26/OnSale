@@ -11,7 +11,7 @@ public class Country
   [Required]
   public string Name { get; set; } = null!;
 
-  public ICollection<State>? States { get; set; }
+  public ICollection<State> States { get; set; }
 
   [Display(Name = "States")]
   public int StatesNumber => States == null ? 0 : States.Count;

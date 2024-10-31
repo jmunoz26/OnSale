@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OnSale.Common;
 using OnSale.Data;
 using OnSale.Data.Entities;
 using OnSale.Helpers;
@@ -8,10 +9,11 @@ using OnSale.Models;
 
 namespace OnSale.Controllers;
 [Authorize(Roles = "Admin")]
-public class UsersController(DataContext context, IUserHelper userHelper) : Controller
+public class UsersController(DataContext context, IUserHelper userHelper, IMailHelper mailHelper) : Controller
 {
   private readonly DataContext _context = context;
   private readonly IUserHelper _userHelper = userHelper;
+  private readonly IMailHelper _mailHelper = mailHelper;
 
   public async Task<IActionResult> Index()
   {
@@ -37,7 +39,27 @@ public class UsersController(DataContext context, IUserHelper userHelper) : Cont
         await _userHelper.PopulateDropdownsAsync(model);
         return View(model);
       }
-      return RedirectToAction("Index", "Home");
+      string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+      string tokenLink = Url.Action("ConfirmEmail", "Account", new
+      {
+        userid = user.Id,
+        token = myToken
+      }, protocol: HttpContext.Request.Scheme);
+
+      Response<bool> response = _mailHelper.SendMail(
+          $"{model.FirstName} {model.LastName}",
+          model.Username,
+          "OnSale - Email Confirmation",
+          $"<h1>OnSale - Email Confirmation</h1>" +
+              $"To enable your account, please click on the following link: " +
+              $"<hr/><br/><p><a href = \"{tokenLink}\">Confirm Email</a></p>");
+      if (response.IsSuccess)
+      {
+        ViewBag.Message = "The instructions to enable the account have been sent to the email.";
+        return View(model);
+      }
+
+      ModelState.AddModelError(string.Empty, response.Message);
     }
 
     await _userHelper.PopulateDropdownsAsync(model);

@@ -83,7 +83,7 @@ public class AccountController(IUserHelper userHelper, DataContext context, ICom
         token = myToken
       }, protocol: HttpContext.Request.Scheme);
 
-      Response response = _mailHelper.SendMail(
+      Response<bool> response = _mailHelper.SendMail(
           $"{model.FirstName} {model.LastName}",
           model.Username,
           "OnSale - Email Confirmation",
