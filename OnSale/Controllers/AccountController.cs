@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OnSale.Common;
 using OnSale.Data;
 using OnSale.Data.Entities;
 using OnSale.Helpers;
@@ -6,12 +8,13 @@ using OnSale.Models;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 namespace OnSale.Controllers;
 
-public class AccountController(IUserHelper userHelper, DataContext context, ICombosHelper combosHelper, IBlobHelper blobHelper) : Controller
+public class AccountController(IUserHelper userHelper, DataContext context, ICombosHelper combosHelper, IBlobHelper blobHelper, IMailHelper mailHelper) : Controller
 {
   private readonly IUserHelper _userHelper = userHelper;
   private readonly DataContext _context = context;
   private readonly ICombosHelper _combosHelper = combosHelper;
   private readonly IBlobHelper _blobHelper = blobHelper;
+  private readonly IMailHelper _mailHelper = mailHelper;
 
   public IActionResult Login()
   {
@@ -38,6 +41,11 @@ public class AccountController(IUserHelper userHelper, DataContext context, ICom
       {
         ModelState.AddModelError(string.Empty, "You have exceeded the maximum number of attempts, your account is blocked, please try again in 5 minutes.");
       }
+      else if (result.IsNotAllowed)
+      {
+        ModelState.AddModelError(string.Empty, "The user has not been enabled, you must follow the instructions in the email sent to enable the user.");
+      }
+
       else
       {
         ModelState.AddModelError(string.Empty, "Incorrect email or password.");
@@ -68,23 +76,67 @@ public class AccountController(IUserHelper userHelper, DataContext context, ICom
         return View(model);
       }
 
-      LoginViewModel loginViewModel = new()
+      string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+      string tokenLink = Url.Action("ConfirmEmail", "Account", new
       {
-        Password = model.Password,
-        RememberMe = false,
-        Username = model.Username
-      };
+        userid = user.Id,
+        token = myToken
+      }, protocol: HttpContext.Request.Scheme);
 
-      var loginSuccessful = await _userHelper.LoginAsync(loginViewModel);
-      if (loginSuccessful.Succeeded)
+      Response response = _mailHelper.SendMail(
+          $"{model.FirstName} {model.LastName}",
+          model.Username,
+          "OnSale - Email Confirmation",
+          $"<h1>OnSale - Email Confirmation</h1>" +
+              $"To enable your account, please click on the following link: " +
+              $"<hr/><br/><p><a href = \"{tokenLink}\">Confirm Email</a></p>");
+      if (response.IsSuccess)
       {
-        return RedirectToAction("Index", "Home");
+        ViewBag.Message = "The instructions to enable your account have been sent to your email.";
+        return View(model);
       }
-    }
 
+      ModelState.AddModelError(string.Empty, response.Message);
+    }
     await _userHelper.PopulateDropdownsAsync(model);
     return View(model);
+
+    // LoginViewModel loginViewModel = new()
+    // {
+    //   Password = model.Password,
+    //   RememberMe = false,
+    //   Username = model.Username
+    // };
+
+    // var loginSuccessful = await _userHelper.LoginAsync(loginViewModel);
+    // if (loginSuccessful.Succeeded)
+    // {
+    //   return RedirectToAction("Index", "Home");
+    // }
   }
+
+  public async Task<IActionResult> ConfirmEmail(string userId, string token)
+  {
+    if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+    {
+      return NotFound();
+    }
+
+    User user = await _userHelper.GetUserAsync(new Guid(userId));
+    if (user == null)
+    {
+      return NotFound();
+    }
+
+    IdentityResult result = await _userHelper.ConfirmEmailAsync(user, token);
+    if (!result.Succeeded)
+    {
+      return NotFound();
+    }
+
+    return View();
+  }
+
   public JsonResult GetStates(int countryId)
   {
     return _userHelper.GetStates(countryId);

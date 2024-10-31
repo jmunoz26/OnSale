@@ -10,9 +10,9 @@ public class City
 
   [MaxLength(50)]
   [Required]
-  public string Name { get; set; }
+  public string Name { get; set; } = null!;
 
   [JsonIgnore]
-  public State State { get; set; }
-  public ICollection<User> Users { get; set; }
+  public State State { get; set; } = null!;
+  public ICollection<User>? Users { get; set; }
 }

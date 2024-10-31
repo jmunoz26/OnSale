@@ -10,22 +10,22 @@ public class User : IdentityUser
   [Display(Name = "Document")]
   [MaxLength(20, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
   [Required(ErrorMessage = "The field {0} is required.")]
-  public string Document { get; set; }
+  public string Document { get; set; } = null!;
 
   [Display(Name = "First Name")]
   [MaxLength(50, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
   [Required(ErrorMessage = "The field {0} is required.")]
-  public string FirstName { get; set; }
+  public string FirstName { get; set; } = null!;
 
   [Display(Name = "Last Name")]
   [MaxLength(50, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
   [Required(ErrorMessage = "The field {0} is required.")]
-  public string LastName { get; set; }
+  public string LastName { get; set; } = null!;
 
   [Display(Name = "Address")]
   [MaxLength(200, ErrorMessage = "The field {0} must have a maximum of {1} characters.")]
   [Required(ErrorMessage = "The field {0} is required.")]
-  public string Address { get; set; }
+  public string Address { get; set; } = null!;
 
   [Display(Name = "Photo")]
   public Guid ImageId { get; set; }
@@ -39,7 +39,7 @@ public class User : IdentityUser
   public UserType UserType { get; set; }
 
   [Display(Name = "City")]
-  public City City { get; set; }
+  public City City { get; set; } = null!;
 
   [Display(Name = "User")]
   public string FullName => $"{FirstName} {LastName}";

@@ -10,11 +10,11 @@ public class State
 
   [MaxLength(50)]
   [Required]
-  public string Name { get; set; }
+  public string Name { get; set; } = null!;
 
   [JsonIgnore]
-  public Country Country { get; set; }
-  public ICollection<City> Cities { get; set; }
+  public Country Country { get; set; } = null!;
+  public ICollection<City>? Cities { get; set; }
 
 
   [Display(Name = "Cities")]

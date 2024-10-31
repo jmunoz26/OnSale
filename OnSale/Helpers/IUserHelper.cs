@@ -25,6 +25,9 @@ public interface IUserHelper
   Task PopulateDropdownsAsync(AddUserViewModel model);
   Task<IdentityResult> ChangePasswordAsync(User user, string oldPassword, string newPassword);
   Task<IdentityResult> UpdateUserAsync(User user);
+  Task<string> GenerateEmailConfirmationTokenAsync(User user);
+  Task<IdentityResult> ConfirmEmailAsync(User user, string token);
+
   Microsoft.AspNetCore.Mvc.JsonResult GetStates(int countryId);
   Microsoft.AspNetCore.Mvc.JsonResult GetCities(int stateId);
 }
